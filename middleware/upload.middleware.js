@@ -1,40 +1,29 @@
 const multer = require("multer");
 const path = require("path");
-const fs = require("fs");
+const fs = require("fs-extra");
 
-const uploadDir = "uploads";
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
+const UPLOAD_DIR = path.join(__dirname, "..", "uploads");
+fs.ensureDirSync(UPLOAD_DIR);
 
 const storage = multer.diskStorage({
-  destination: uploadDir,
+  destination: UPLOAD_DIR,
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+    cb(null, `${Date.now()}-${file.originalname}`);
   }
 });
 
-// ✅ ALLOWED FILE TYPES
-const allowedExtensions = [".zip", ".py", ".java", ".js"];
+const allowedExt = [".zip", ".js", ".py", ".java"];
 
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-
-  if (allowedExtensions.includes(ext)) {
-    cb(null, true);
-  } else {
-    cb(
-      new Error(
-        "Only ZIP, Python (.py), Java (.java), and JavaScript (.js) files are allowed"
-      )
-    );
+  if (!allowedExt.includes(ext)) {
+    return cb(new Error("Only .zip, .js, .py, .java files allowed"));
   }
+  cb(null, true);
 };
 
 module.exports = multer({
   storage,
   fileFilter,
-  limits: {
-    fileSize: 50 * 1024 * 1024 // 50MB
-  }
-}).any(); // ✅ flexible but controlled
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB
+});

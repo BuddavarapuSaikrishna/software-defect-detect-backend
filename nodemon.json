@@ -1,0 +1,10 @@
+{
+  "watch": ["app.js", "controllers", "routes", "services", "utils"],
+  "ignore": [
+    "uploads/**",
+    "extracted/**",
+    ".scannerwork/**",
+    "node_modules/**"
+  ],
+  "ext": "js,json"
+}

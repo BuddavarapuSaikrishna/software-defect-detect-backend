@@ -1,26 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const uploadMiddleware = require("../middleware/upload.middleware");
-const uploadController = require("../controllers/upload.controller");
 
-router.post("/sample", (req, res) => {
-  res.json({
-    success: true,
-    message: "Sample POST API working ✅",
-    receivedData: req.body
-  });
-});
+const upload = require("../middleware/upload.middleware");
+const { analyzeProject } = require("../controllers/upload.controller");
 
-router.post("/upload", (req, res, next) => {
-  uploadMiddleware(req, res, function (err) {
-    if (err) {
-      return res.status(400).json({
-        success: false,
-        message: err.message
-      });
-    }
-    next();
-  });
-}, uploadController.analyzeProject);
+router.post("/upload", upload.array("file", 1), analyzeProject);
 
 module.exports = router;
